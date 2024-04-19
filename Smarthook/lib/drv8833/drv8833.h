@@ -3,8 +3,8 @@
 Erik Lindsten @ KTH 2024
 */
 
-#ifndef DRV8833_MOTOR_DRIVER_H
-#define DRV8833_MOTOR_DRIVER_H
+#ifndef DRV8833_H
+#define DRV8833_H
 
 #include <Arduino.h>
 
