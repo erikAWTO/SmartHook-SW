@@ -1,3 +1,8 @@
+/* MFRC522 driver with EEPROM storage for RFID UIDs
+
+Erik Lindsten @ KTH 2024
+*/
+
 #include <rfid.h>
 
 Rfid::Rfid(void)
@@ -14,33 +19,35 @@ void Rfid::begin()
     rfidReader.PCD_DumpVersionToSerial();
 }
 
-void Rfid::readCardUID()
+bool Rfid::readCardUID()
 {
     // Look for new cards
     if (!rfidReader.PICC_IsNewCardPresent())
     {
-        return;
+        return false;
     }
 
     // Select one of the cards
     if (!rfidReader.PICC_ReadCardSerial())
     {
-        return;
+        return false;
     }
 
     // Store card UID. Should be 7 bytes for KTH RFID cards
-    for (byte i = 0; i < rfidReader.uid.size; i++)
+    for (uint8_t i = 0; i < rfidReader.uid.size; i++)
     {
         cardUID[i] = rfidReader.uid.uidByte[i];
     }
 
     printCardUID();
+
+    return true;
 }
 
 bool Rfid::compareCardUID()
 {
     // Compare card UID with stored UID
-    for (byte i = 0; i < sizeof(cardUID) / sizeof(uint8_t); i++)
+    for (uint8_t i = 0; i < sizeof(cardUID) / sizeof(uint8_t); i++)
     {
         if (cardUID[i] != EEPROM.read(i))
         {
@@ -51,22 +58,26 @@ bool Rfid::compareCardUID()
     return true;
 }
 
-void Rfid::storeCardUID()
+bool Rfid::storeCardUID()
 {
     // Store card UID in EEPROM
-    for (byte i = 0; i < sizeof(cardUID) / sizeof(uint8_t); i++)
+    for (uint8_t i = 0; i < sizeof(cardUID) / sizeof(uint8_t); i++)
     {
         EEPROM.write(i, cardUID[i]);
     }
+
+    return true;
 }
 
-void Rfid::clearCardUID()
+bool Rfid::clearCardUID()
 {
     // Clear stored UID in EEPROM
-    for (byte i = 0; i < sizeof(cardUID) / sizeof(uint8_t); i++)
+    for (uint8_t i = 0; i < sizeof(cardUID) / sizeof(uint8_t); i++)
     {
         EEPROM.write(i, 0);
     }
+    
+    return true;
 }
 
 void Rfid::printCardUID(void)
@@ -74,7 +85,7 @@ void Rfid::printCardUID(void)
     Serial.println();
     Serial.print(" UID: ");
     String content = "";
-    for (byte i = 0; i < rfidReader.uid.size; i++)
+    for (uint8_t i = 0; i < rfidReader.uid.size; i++)
     {
         Serial.print(cardUID[i] < 0x10 ? " 0" : " ");
         Serial.print(cardUID[i], HEX);

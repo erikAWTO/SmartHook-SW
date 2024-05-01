@@ -11,29 +11,26 @@ Erik Lindsten @ KTH 2024
 class DRV8833 {
   public:
     // Constructor
-    DRV8833(uint8_t motorAInput1Pin, uint8_t motorAInput2Pin, uint8_t motorBInput1Pin, uint8_t motorBInput2Pin);
+    DRV8833(uint8_t motorInput1Pin, uint8_t motorInput2Pin);
 
     // Initialize motor pins
     void begin();
 
     // Control motor A speed and direction
-    void controlMotorA(bool direction);
-
-    // Control motor B speed and direction
-    void controlMotorB(bool direction);
+    void controlMotor(bool direction);
 
     // Stop motor A
-    void stopMotorA(void);
+    void stopMotor(void);
 
-    // Stop motor B
-    void stopMotorB(void);
+  typedef enum {
+    FORWARD = 0,
+    BACKWARD = 1,
+  } MOTOR_DIRECTION;
 
   private:
     // Motor control pins
-    uint8_t motorAInput1Pin;
-    uint8_t motorAInput2Pin;
-    uint8_t motorBInput1Pin;
-    uint8_t motorBInput2Pin;
+    uint8_t motorInput1Pin;
+    uint8_t motorInput2Pin;
 };
 
 #endif

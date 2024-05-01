@@ -22,16 +22,16 @@ public:
     void begin();
 
     // Read card UID
-    void readCardUID();
+    bool readCardUID();
 
     // Compare card UID with stored UID
     bool compareCardUID();
 
     // Store card UID
-    void storeCardUID();
+    bool storeCardUID();
 
     // Clear stored UID
-    void clearCardUID();
+    bool clearCardUID();
 
     // Print card UID
     void printCardUID();
@@ -41,7 +41,7 @@ private:
     uint8_t cardUID[7];
 
     // RFID reader
-    MFRC522 rfidReader = MFRC522(10, 9);
+    MFRC522 rfidReader = MFRC522(SS_PIN, RST_PIN);
 };
 
 
