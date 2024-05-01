@@ -11,9 +11,6 @@ Servo lockServo;
 Rfid rfid;
 
 bool doorLocked = false;
-unsigned long doorUnlockTime = 0;
-
-unsigned int lockServoPos = 0;
 
 void closeDoor();
 void openDoor();
@@ -75,11 +72,8 @@ void loop()
     else
     {
       blinkLED(LED_GREEN_PIN, 3, 500); // Blink green LED to indicate unauthorized access
-
       rfid.storeCardUID();
-
       closeDoor();
-
       EEPROM.put(doorLockedAddress, doorLocked); // Write doorLocked to EEPROM, so that the door stays locked after power loss
     }
   }
@@ -100,7 +94,7 @@ void openDoor()
 {
   servoUnlock();
   delay(3000);                            // Wait for lock to unlock
-  while (!digitalRead(LIM_SW_OPENED_PIN)) // Open door until limit switch is pressed
+  while (digitalRead(LIM_SW_OPENED_PIN)) // Open door until limit switch is pressed
   {
     motor.controlMotor(motor.UP);
   }
@@ -110,7 +104,7 @@ void openDoor()
 
 void closeDoor()
 {
-  while (!digitalRead(LIM_SW_CLOSED_PIN)) // Close door until limit switch is pressed
+  while (digitalRead(LIM_SW_CLOSED_PIN)) // Close door until limit switch is pressed
   {
     motor.controlMotor(motor.DOWN);
   }
