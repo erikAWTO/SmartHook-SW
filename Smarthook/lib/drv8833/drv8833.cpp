@@ -22,7 +22,7 @@ void DRV8833::begin()
     digitalWrite(motorInput2Pin, LOW);
 }
 
-// Control motor A speed and direction
+// Control motor direction
 void DRV8833::controlMotor(bool direction)
 {
     if (direction == true)
@@ -37,7 +37,7 @@ void DRV8833::controlMotor(bool direction)
     }
 }
 
-// Stop motor A
+// Stop motor 
 void DRV8833::stopMotor(void)
 {
 

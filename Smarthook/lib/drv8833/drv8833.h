@@ -23,8 +23,8 @@ class DRV8833 {
     void stopMotor(void);
 
   typedef enum {
-    FORWARD = 0,
-    BACKWARD = 1,
+    UP = 0,
+    DOWN = 1,
   } MOTOR_DIRECTION;
 
   private:
