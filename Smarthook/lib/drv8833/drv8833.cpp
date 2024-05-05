@@ -18,8 +18,8 @@ void DRV8833::begin()
     pinMode(motorInput1Pin, OUTPUT);
     pinMode(motorInput2Pin, OUTPUT);
 
-    digitalWrite(motorInput1Pin, LOW);
-    digitalWrite(motorInput2Pin, LOW);
+    analogWrite(motorInput1Pin, 0);
+    analogWrite(motorInput2Pin, 0);
 }
 
 // Control motor direction
@@ -27,13 +27,13 @@ void DRV8833::controlMotor(bool direction)
 {
     if (direction == true)
     {
-        digitalWrite(motorInput1Pin, HIGH);
-        digitalWrite(motorInput2Pin, LOW);
+        analogWrite(motorInput1Pin, 128);
+        analogWrite(motorInput2Pin, 0);
     }
     else
     {
-        digitalWrite(motorInput1Pin, LOW);
-        digitalWrite(motorInput2Pin, HIGH);
+        analogWrite(motorInput1Pin, 0);
+        analogWrite(motorInput2Pin, 128);
     }
 }
 
@@ -41,6 +41,6 @@ void DRV8833::controlMotor(bool direction)
 void DRV8833::stopMotor(void)
 {
 
-    digitalWrite(motorInput1Pin, LOW);
-    digitalWrite(motorInput2Pin, LOW);
+    analogWrite(motorInput1Pin, 0);
+    analogWrite(motorInput2Pin, 0);
 }

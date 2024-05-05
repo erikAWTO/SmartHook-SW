@@ -6,11 +6,15 @@
 #include <predefs.h>
 #include <EEPROM.h>
 
+#define DEBUG 0
+
 DRV8833 motor(MOTOR_PIN_1, MOTOR_PIN_2);
 Servo lockServo;
 Rfid rfid;
 
-bool doorLocked = false;
+bool doorLocked = 0;
+
+int servoPos = 0;
 
 void closeDoor();
 void openDoor();
@@ -33,19 +37,34 @@ void setup()
   motor.begin();
 
   lockServo.attach(LOCK_SERVO_PIN);
+  lockServo.write(UNLOCK_PWM_VAL);
 
   rfid.begin();
 
-  doorLocked = EEPROM.get(doorLockedAddress, doorLocked); // Read door status from EEPROM
+  doorLocked = EEPROM.get(DOOR_LOCKED_ADDRESS, doorLocked); // Read door status from EEPROM
 
   for (int i = 0; i < 3; i++) // Blink LEDs to indicate initialization
   {
     digitalWrite(LED_RED_PIN, HIGH);
     digitalWrite(LED_GREEN_PIN, HIGH);
-    delay(500);
+    delay(250);
     digitalWrite(LED_RED_PIN, LOW);
     digitalWrite(LED_GREEN_PIN, LOW);
-    delay(500);
+    delay(250);
+  }
+
+  // dump EEPROM contents
+  if (DEBUG)
+  {
+    Serial.println("Dumping EEPROM contents:");
+    for (int address = 0; address < EEPROM.length(); address++)
+    {
+      byte value = EEPROM.read(address);
+      Serial.print("Address: ");
+      Serial.print(address);
+      Serial.print(" Value: ");
+      Serial.println(value);
+    }
   }
 
   Serial.println("Initialization done!");
@@ -55,26 +74,49 @@ void loop()
 {
   if (rfid.readCardUID()) // Card detected
   {
+
+    Serial.println("Card detected!");
+
     if (doorLocked)
     {
+      Serial.println("Door is locked!");
+
       if (rfid.compareCardUID()) // Card matches stored UID
       {
-        blinkLED(LED_GREEN_PIN, 3, 500); // Blink green LED to indicate authorized access
+        Serial.println("Card matches stored UID!");
+        blinkLED(LED_GREEN_PIN, 3, 250); // Blink green LED to indicate authorized access
         openDoor();
         rfid.clearCardUID();
-        EEPROM.put(doorLockedAddress, doorLocked); // Write doorLocked to EEPROM, so that the door stays unlocked after power loss
+        EEPROM.put(DOOR_LOCKED_ADDRESS, doorLocked); // Write doorLocked to EEPROM, so that the door stays unlocked after power loss
       }
       else
       {
+        Serial.println("Card does not match stored UID!");
         blinkLED(LED_RED_PIN, 3, 500); // Blink red LED to indicate authorized access
       }
     }
     else
     {
-      blinkLED(LED_GREEN_PIN, 3, 500); // Blink green LED to indicate unauthorized access
+      Serial.println("Door is unlocked!");
+      blinkLED(LED_GREEN_PIN, 3, 250); // Blink green LED to indicate unauthorized access
       rfid.storeCardUID();
+      Serial.println("Stored UID!");
       closeDoor();
-      EEPROM.put(doorLockedAddress, doorLocked); // Write doorLocked to EEPROM, so that the door stays locked after power loss
+      EEPROM.put(DOOR_LOCKED_ADDRESS, doorLocked); // Write doorLocked to EEPROM, so that the door stays locked after power loss
+    }
+
+    if (DEBUG)
+    {
+      Serial.println("Door status: " + String(doorLocked));
+      Serial.println("Dumping EEPROM contents:");
+      for (int address = 0; address < EEPROM.length(); address++)
+      {
+        byte value = EEPROM.read(address);
+        Serial.print("Address: ");
+        Serial.print(address);
+        Serial.print(" Value: ");
+        Serial.println(value);
+      }
     }
   }
 }
@@ -93,7 +135,7 @@ void blinkLED(int pin, int iterations, int delayTime)
 void openDoor()
 {
   servoUnlock();
-  delay(3000);                            // Wait for lock to unlock
+  delay(2000);                           // Wait for lock to unlock
   while (digitalRead(LIM_SW_OPENED_PIN)) // Open door until limit switch is pressed
   {
     motor.controlMotor(motor.UP);
@@ -109,27 +151,27 @@ void closeDoor()
     motor.controlMotor(motor.DOWN);
   }
   motor.stopMotor();
-  delay(3000);
+  delay(2000);
   servoLock();
   doorLocked = true;
 }
 
 void servoLock()
 {
-  for (int pos = 0; pos <= LOCK_PWM_VAL; pos += 1)
+  for (servoPos = UNLOCK_PWM_VAL; servoPos <= LOCK_PWM_VAL; servoPos += 1)
   {
     // in steps of 1 degree
-    lockServo.write(pos);
-    delay(10);
+    lockServo.write(servoPos);
+    delay(15);
   }
 }
 
 void servoUnlock()
 {
-  for (int pos = LOCK_PWM_VAL; pos >= 0; pos -= 1)
+  for (servoPos = LOCK_PWM_VAL; servoPos >= UNLOCK_PWM_VAL; servoPos -= 1)
   {
     // in steps of 1 degree
-    lockServo.write(pos);
-    delay(10);
+    lockServo.write(servoPos);
+    delay(15);
   }
 }

@@ -12,6 +12,8 @@ Erik Lindsten @ KTH 2024
 #include <MFRC522.h>
 #include <SPI.h>
 
+
+
 class Rfid
 {
 public:
@@ -41,7 +43,7 @@ private:
     uint8_t cardUID[7];
 
     // RFID reader
-    MFRC522 rfidReader = MFRC522(SS_PIN, RST_PIN);
+    MFRC522 rfidReader = MFRC522(10, 9);
 };
 
 

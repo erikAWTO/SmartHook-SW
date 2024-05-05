@@ -5,6 +5,8 @@ Erik Lindsten @ KTH 2024
 
 #include <rfid.h>
 
+const unsigned int UID_ADDRESS = 32;
+
 Rfid::Rfid(void)
 {
 }
@@ -49,7 +51,7 @@ bool Rfid::compareCardUID()
     // Compare card UID with stored UID
     for (uint8_t i = 0; i < sizeof(cardUID) / sizeof(uint8_t); i++)
     {
-        if (cardUID[i] != EEPROM.read(i))
+        if (cardUID[i] != EEPROM.read(i + UID_ADDRESS))
         {
             return false;
         }
@@ -60,13 +62,14 @@ bool Rfid::compareCardUID()
 
 bool Rfid::storeCardUID()
 {
-    // Store card UID in EEPROM
+    // Store card UID in EEPROM with offset UID_ADDRESS
     for (uint8_t i = 0; i < sizeof(cardUID) / sizeof(uint8_t); i++)
     {
-        EEPROM.write(i, cardUID[i]);
+        EEPROM.write(i + UID_ADDRESS, cardUID[i]);
     }
 
     return true;
+
 }
 
 bool Rfid::clearCardUID()
@@ -74,7 +77,7 @@ bool Rfid::clearCardUID()
     // Clear stored UID in EEPROM
     for (uint8_t i = 0; i < sizeof(cardUID) / sizeof(uint8_t); i++)
     {
-        EEPROM.write(i, 0);
+        EEPROM.write(i + UID_ADDRESS, 0);
     }
     
     return true;
