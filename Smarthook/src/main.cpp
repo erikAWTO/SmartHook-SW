@@ -53,13 +53,12 @@ void setup()
     delay(250);
   }
 
-  // dump EEPROM contents
   if (DEBUG)
   {
     Serial.println("Dumping EEPROM contents:");
-    for (int address = 0; address < EEPROM.length(); address++)
+    for (unsigned int address = 0; address < EEPROM.length(); address++)
     {
-      byte value = EEPROM.read(address);
+      uint8_t value = EEPROM.read(address);
       Serial.print("Address: ");
       Serial.print(address);
       Serial.print(" Value: ");
@@ -84,7 +83,7 @@ void loop()
       if (rfid.compareCardUID()) // Card matches stored UID
       {
         Serial.println("Card matches stored UID!");
-        blinkLED(LED_GREEN_PIN, 3, 250); // Blink green LED to indicate authorized access
+        blinkLED(LED_GREEN_PIN, 3, 250);
         openDoor();
         rfid.clearCardUID();
         EEPROM.put(DOOR_LOCKED_ADDRESS, doorLocked); // Write doorLocked to EEPROM, so that the door stays unlocked after power loss
@@ -98,25 +97,11 @@ void loop()
     else
     {
       Serial.println("Door is unlocked!");
-      blinkLED(LED_GREEN_PIN, 3, 250); // Blink green LED to indicate unauthorized access
+      blinkLED(LED_GREEN_PIN, 3, 250);
       rfid.storeCardUID();
       Serial.println("Stored UID!");
       closeDoor();
       EEPROM.put(DOOR_LOCKED_ADDRESS, doorLocked); // Write doorLocked to EEPROM, so that the door stays locked after power loss
-    }
-
-    if (DEBUG)
-    {
-      Serial.println("Door status: " + String(doorLocked));
-      Serial.println("Dumping EEPROM contents:");
-      for (int address = 0; address < EEPROM.length(); address++)
-      {
-        byte value = EEPROM.read(address);
-        Serial.print("Address: ");
-        Serial.print(address);
-        Serial.print(" Value: ");
-        Serial.println(value);
-      }
     }
   }
 }
@@ -162,7 +147,7 @@ void servoLock()
   {
     // in steps of 1 degree
     lockServo.write(servoPos);
-    delay(15);
+    delay(5);
   }
 }
 
@@ -172,6 +157,6 @@ void servoUnlock()
   {
     // in steps of 1 degree
     lockServo.write(servoPos);
-    delay(15);
+    delay(5);
   }
 }

@@ -11,6 +11,9 @@ Erik Lindsten @ KTH 2024
 #include <EEPROM.h>
 #include <MFRC522.h>
 #include <SPI.h>
+#include <predefs.h>
+#include <pindefs.h>
+
 
 
 
@@ -43,7 +46,7 @@ private:
     uint8_t cardUID[7];
 
     // RFID reader
-    MFRC522 rfidReader = MFRC522(10, 9);
+    MFRC522 rfidReader = MFRC522(SS_PIN, RST_PIN);
 };
 
 

@@ -1,4 +1,4 @@
-/* Motor driver for DRV8833 with no speed control
+/* Motor driver for DRV8833 for single motor with no speed control
 
 Erik Lindsten @ KTH 2024
 */

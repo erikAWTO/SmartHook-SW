@@ -5,7 +5,6 @@ Erik Lindsten @ KTH 2024
 
 #include <rfid.h>
 
-const unsigned int UID_ADDRESS = 32;
 
 Rfid::Rfid(void)
 {
