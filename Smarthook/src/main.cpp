@@ -41,9 +41,9 @@ void setup()
 
   rfid.begin();
 
-  doorLocked = EEPROM.get(DOOR_LOCKED_ADDRESS, doorLocked); // Read door status from EEPROM
+  doorLocked = EEPROM.get(DOOR_LOCKED_ADDRESS, doorLocked); // Läs dörr status från EEPROM
 
-  for (int i = 0; i < 3; i++) // Blink LEDs to indicate initialization
+  for (int i = 0; i < 3; i++) // Blinka LEDs för att indikera att initiering är klar
   {
     digitalWrite(LED_RED_PIN, HIGH);
     digitalWrite(LED_GREEN_PIN, HIGH);
@@ -53,25 +53,12 @@ void setup()
     delay(250);
   }
 
-  if (DEBUG)
-  {
-    Serial.println("Dumping EEPROM contents:");
-    for (unsigned int address = 0; address < EEPROM.length(); address++)
-    {
-      uint8_t value = EEPROM.read(address);
-      Serial.print("Address: ");
-      Serial.print(address);
-      Serial.print(" Value: ");
-      Serial.println(value);
-    }
-  }
-
   Serial.println("Initialization done!");
 }
 
 void loop()
 {
-  if (rfid.readCardUID()) // Card detected
+  if (rfid.readCardUID()) // Kort detekterat
   {
 
     Serial.println("Card detected!");
@@ -80,18 +67,18 @@ void loop()
     {
       Serial.println("Door is locked!");
 
-      if (rfid.compareCardUID()) // Card matches stored UID
+      if (rfid.compareCardUID()) // Kort matchar lagrad UID
       {
         Serial.println("Card matches stored UID!");
         blinkLED(LED_GREEN_PIN, 3, 250);
         openDoor();
         rfid.clearCardUID();
-        EEPROM.put(DOOR_LOCKED_ADDRESS, doorLocked); // Write doorLocked to EEPROM, so that the door stays unlocked after power loss
+        EEPROM.put(DOOR_LOCKED_ADDRESS, doorLocked); // Skriv doorLocked till EEPROM, så att dörren förblir låst efter strömavbrott
       }
       else
       {
         Serial.println("Card does not match stored UID!");
-        blinkLED(LED_RED_PIN, 3, 500); // Blink red LED to indicate authorized access
+        blinkLED(LED_RED_PIN, 3, 500);
       }
     }
     else
@@ -101,7 +88,7 @@ void loop()
       rfid.storeCardUID();
       Serial.println("Stored UID!");
       closeDoor();
-      EEPROM.put(DOOR_LOCKED_ADDRESS, doorLocked); // Write doorLocked to EEPROM, so that the door stays locked after power loss
+      EEPROM.put(DOOR_LOCKED_ADDRESS, doorLocked); // Skriv doorLocked till EEPROM, så att dörren förblir låst efter strömavbrott
     }
   }
 }
@@ -120,8 +107,8 @@ void blinkLED(int pin, int iterations, int delayTime)
 void openDoor()
 {
   servoUnlock();
-  delay(2000);                           // Wait for lock to unlock
-  while (digitalRead(LIM_SW_OPENED_PIN)) // Open door until limit switch is pressed
+  delay(2000);                           // Vänta 2 sekunder innan dörren öppnas
+  while (digitalRead(LIM_SW_OPENED_PIN)) // Öppna dörren tills brytaren är aktiverad
   {
     motor.controlMotor(motor.UP);
   }
@@ -131,7 +118,7 @@ void openDoor()
 
 void closeDoor()
 {
-  while (digitalRead(LIM_SW_CLOSED_PIN)) // Close door until limit switch is pressed
+  while (digitalRead(LIM_SW_CLOSED_PIN)) // Stäng dörren tills brytaren är aktiverad
   {
     motor.controlMotor(motor.DOWN);
   }
@@ -145,9 +132,8 @@ void servoLock()
 {
   for (servoPos = UNLOCK_PWM_VAL; servoPos <= LOCK_PWM_VAL; servoPos += 1)
   {
-    // in steps of 1 degree
     lockServo.write(servoPos);
-    delay(5);
+    delay(20);
   }
 }
 
@@ -155,8 +141,7 @@ void servoUnlock()
 {
   for (servoPos = LOCK_PWM_VAL; servoPos >= UNLOCK_PWM_VAL; servoPos -= 1)
   {
-    // in steps of 1 degree
     lockServo.write(servoPos);
-    delay(5);
+    delay(20);
   }
 }

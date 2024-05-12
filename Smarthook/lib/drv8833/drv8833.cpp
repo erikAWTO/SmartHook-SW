@@ -1,18 +1,13 @@
-/* Motor driver for DRV8833 for single motor with no speed control
-
-Erik Lindsten @ KTH 2024
-*/
+/* Motordrivare för DRV8833 utan hastighetsreglering och enbart en kanal. */
 
 #include "drv8833.h"
 
-// Constructor
 DRV8833::DRV8833(uint8_t motorInput1Pin, uint8_t motorInput2Pin)
 {
     this->motorInput1Pin = motorInput1Pin;
     this->motorInput2Pin = motorInput2Pin;
 }
 
-// Initialize motor pins
 void DRV8833::begin()
 {
     pinMode(motorInput1Pin, OUTPUT);
@@ -22,7 +17,6 @@ void DRV8833::begin()
     analogWrite(motorInput2Pin, 0);
 }
 
-// Control motor direction
 void DRV8833::controlMotor(bool direction)
 {
     if (direction == true)
@@ -37,8 +31,7 @@ void DRV8833::controlMotor(bool direction)
     }
 }
 
-// Stop motor 
-void DRV8833::stopMotor(void)
+void DRV8833::stopMotor()
 {
 
     analogWrite(motorInput1Pin, 0);

@@ -1,7 +1,4 @@
-/* MFRC522 driver with EEPROM storage for RFID UIDs
-
-Erik Lindsten @ KTH 2024
-*/
+/* Bibliotek för att läsa av RFID UIDs och spara/läsa till EEPROM */
 
 #include <rfid.h>
 
@@ -12,29 +9,27 @@ Rfid::Rfid(void)
 
 void Rfid::begin()
 {
-    // Initialize SPI bus
     SPI.begin();
 
-    // Initialize RFID reader
     rfidReader.PCD_Init();
     rfidReader.PCD_DumpVersionToSerial();
 }
 
 bool Rfid::readCardUID()
 {
-    // Look for new cards
+    // Kolla om kort är närvarande
     if (!rfidReader.PICC_IsNewCardPresent())
     {
         return false;
     }
 
-    // Select one of the cards
+    // Välj ett av korten
     if (!rfidReader.PICC_ReadCardSerial())
     {
         return false;
     }
 
-    // Store card UID. Should be 7 bytes for KTH RFID cards
+    // Spara kortets UID. Ska vara 7 byte för KTH RFID-kort
     for (uint8_t i = 0; i < rfidReader.uid.size; i++)
     {
         cardUID[i] = rfidReader.uid.uidByte[i];
@@ -47,7 +42,7 @@ bool Rfid::readCardUID()
 
 bool Rfid::compareCardUID()
 {
-    // Compare card UID with stored UID
+    // Jämför kortets UID med sparade UID
     for (uint8_t i = 0; i < sizeof(cardUID) / sizeof(uint8_t); i++)
     {
         if (cardUID[i] != EEPROM.read(i + UID_ADDRESS))
@@ -61,7 +56,7 @@ bool Rfid::compareCardUID()
 
 bool Rfid::storeCardUID()
 {
-    // Store card UID in EEPROM with offset UID_ADDRESS
+    // Spara kortets UID i EEPROM med förskjutning UID_ADDRESS
     for (uint8_t i = 0; i < sizeof(cardUID) / sizeof(uint8_t); i++)
     {
         EEPROM.write(i + UID_ADDRESS, cardUID[i]);
@@ -73,7 +68,7 @@ bool Rfid::storeCardUID()
 
 bool Rfid::clearCardUID()
 {
-    // Clear stored UID in EEPROM
+    // Rensa sparade UID i EEPROM
     for (uint8_t i = 0; i < sizeof(cardUID) / sizeof(uint8_t); i++)
     {
         EEPROM.write(i + UID_ADDRESS, 0);
@@ -82,7 +77,7 @@ bool Rfid::clearCardUID()
     return true;
 }
 
-void Rfid::printCardUID(void)
+void Rfid::printCardUID()
 {
     Serial.println();
     Serial.print(" UID: ");

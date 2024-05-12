@@ -1,7 +1,4 @@
-/* Motor driver for DRV8833 for single motor with no speed control
-
-Erik Lindsten @ KTH 2024
-*/
+/* Bibliotek för DRV8833 utan hastighetsreglering och enbart en kanal. */
 
 #ifndef DRV8833_H
 #define DRV8833_H
@@ -10,17 +7,13 @@ Erik Lindsten @ KTH 2024
 
 class DRV8833 {
   public:
-    // Constructor
     DRV8833(uint8_t motorInput1Pin, uint8_t motorInput2Pin);
 
-    // Initialize motor pins
     void begin();
 
-    // Control motor A speed and direction
     void controlMotor(bool direction);
 
-    // Stop motor A
-    void stopMotor(void);
+    void stopMotor();
 
   typedef enum {
     UP = 0,
@@ -28,7 +21,6 @@ class DRV8833 {
   } MOTOR_DIRECTION;
 
   private:
-    // Motor control pins
     uint8_t motorInput1Pin;
     uint8_t motorInput2Pin;
 };
